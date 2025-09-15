@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>算命学占い - 無料オンライン占いサービス</title>
+    <meta name="description" content="生年月日から算命学で詳しく占います。十干支、天中殺、性格診断、人体図まで無料で利用できる本格的な算命学占いサイトです。">
+    <meta name="keywords" content="算命学, 占い, 無料占い, 十干支, 天中殺, 人体図, 性格診断">
+    <meta property="og:title" content="算命学占い - 無料オンライン占いサービス">
+    <meta property="og:description" content="生年月日から算命学で詳しく占います">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', 'Hiragino Kaku Gothic Pro', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .input-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .calculate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .result-section {
+            margin-bottom: 30px;
+        }
+
+        .result-section h3 {
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .human-chart {
+            display: grid;
+            grid-template-areas: 
+                ". north ."
+                "west center east"
+                ". south .";
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            gap: 10px;
+            max-width: 350px;
+            margin: 20px auto;
+        }
+
+        .chart-position {
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .chart-position:hover {
+            transform: scale(1.05);
+        }
+
+        .chart-center { grid-area: center; background: linear-gradient(135deg, #ffd700, #ffed4e); }
+        .chart-north { grid-area: north; background: linear-gradient(135deg, #87ceeb, #a8dadc); }
+        .chart-south { grid-area: south; background: linear-gradient(135deg, #ffa500, #ffb347); }
+        .chart-east { grid-area: east; background: linear-gradient(135deg, #98fb98, #90ee90); }
+        .chart-west { grid-area: west; background: linear-gradient(135deg, #dda0dd, #e6e6fa); }
+
+        .star-name {
+            font-size: 14px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .star-type {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .characteristics {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .characteristics p {
+            margin-bottom: 10px;
+        }
+
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(231, 76, 60, 0.1);
+            border-radius: 5px;
+        }
+
+        .success {
+            color: #27ae60;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 3px solid #667eea;
+            border-top: 3px solid transparent;
+            border-radius: 50%;
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .info-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .info-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .privacy-notice {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.8);
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .input-section, .results, .info-section {
+                padding: 20px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .human-chart {
+                max-width: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔮 算命学占い</h1>
+            <p>生年月日から運勢を詳しく占います</p>
+            
+            <div class="features">
+                <div class="feature-card">
+                    <h3>🌟 十干支診断</h3>
+                    <p>生年月日から十干支を算出し、基本性格を診断</p>
+                </div>
+                <div class="feature-card">
+                    <h3>👤 人体図作成</h3>
+                    <p>精神・行動・家庭・社会面の特徴を視覚化</p>
+                </div>
+                <div class="feature-card">
+                    <h3>⚠️ 天中殺判定</h3>
+                    <p>注意すべき時期と対策をお知らせ</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <h2 style="text-align: center; margin-bottom: 20px; color: #667eea;">占い情報入力</h2>
+            
+            <div class="form-group">
+                <label for="name">お名前</label>
+                <input type="text" id="name" placeholder="お名前を入力してください" maxlength="50">
+            </div>
+            
+            <div class="form-group">
+                <label for="birthdate">生年月日</label>
+                <input type="date" id="birthdate" min="1900-01-01">
+            </div>
+            
+            <div class="form-group">
+                <label for="gender">性別</label>
+                <select id="gender">
+                    <option value="">選択してください</option>
+                    <option value="male">男性</option>
+                    <option value="female">女性</option>
+                </select>
+            </div>
+            
+            <button class="calculate-btn" onclick="calculateFortune()">🔮 占う</button>
+            <div id="loading" class="loading"></div>
+            <div id="error" class="error"></div>
+        </div>
+
+        <div id="results" class="results">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #667eea;">✨ 占い結果 ✨</h2>
+            
+            <div class="result-section">
+                <h3>📋 基本情報</h3>
+                <div id="basic-info"></div>
+            </div>
+
+            <div class="result-section">
+                <h3>👤 人体図</h3>
+                <div class="human-chart">
+                    <div id="north" class="chart-position chart-north">
+                        <div class="star-name">北</div>
+                        <div class="star-type">精神面</div>
+                    </div>
+                    <div id="center" class="chart-position chart-center">
+                        <div class="star-name">中央</div>
+                        <div class="star-type">自分自身</div>
+                    </div>
+                    <div id="east" class="chart-position chart-east">
+                        <div class="star-name">東</div>
+                        <div class="star-type">行動面</div>
+                    </div>
+                    <div id="west" class="chart-position chart-west">
+                        <div class="star-name">西</div>
+                        <div class="star-type">家庭面</div>
+                    </div>
+                    <div id="south" class="chart-position chart-south">
+                        <div class="star-name">南</div>
+                        <div class="star-type">社会面</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-section">
+                <h3>🌟 性格・特徴</h3>
+                <div id="characteristics" class="characteristics"></div>
+            </div>
+
+            <div class="result-section">
+                <h3>⚠️ 天中殺</h3>
+                <div id="tenchukill"></div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button onclick="location.reload()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    🔄 もう一度占う
+                </button>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>📚 算命学について</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>算命学とは</h4>
+                    <p>中国古代から伝わる運命学の一つで、生年月日から人の性格や運勢を詳細に分析する学問です。</p>
+                </div>
+                <div class="info-card">
+                    <h4>十干支の意味</h4>
+                    <p>十干（甲乙丙丁戊己庚辛壬癸）と十二支の組み合わせで、60通りの性格パターンを表現します。</p>
+                </div>
+                <div class="info-card">
+                    <h4>人体図の見方</h4>
+                    <p>中央は本来の自分、北は精神面、南は社会面、東は行動面、西は家庭面を表しています。</p>
+                </div>
+                <div class="info-card">
+                    <h4>天中殺について</h4>
+                    <p>人生において特に注意すべき時期を示し、大きな決断や変化は避けることが推奨されます。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 算命学占い | 無料オンライン占いサービス</p>
+        <div class="privacy-notice">
+            <p>※入力された個人情報は占い結果の表示のみに使用され、サーバーに保存されることはありません。</p>
+            <p>※この占いは娯楽目的であり、人生の重要な決定の参考程度にとどめてください。</p>
+        </div>
+    </footer>
+
+    <script>
+        // Excelファイルから取得したデータをJavaScriptオブジェクトとして定義
+        const GANJIS = {
+            '甲': { element: '木', yin_yang: '陽', nature: '樹木、巨木、大木', characteristics: '自立心が強い、頑固、独立独歩、芯が強い、マイペース、守り' },
+            '乙': { element: '木', yin_yang: '陰', nature: '草木、藤、苔、蔦', characteristics: '社交性、協調性、和合性、リーダーシップ、政治力' },
+            '丙': { element: '火', yin_yang: '陽', nature: '太陽', characteristics: '情報伝達、おおらか、自然体、食碌、長寿、正確に伝える' },
+            '丁': { element: '火', yin_yang: '陰', nature: '灯火、ろうそく', characteristics: '繊細、デリケート、孤独、反発心、向上心、温かい心' },
+            '戊': { element: '土', yin_yang: '陽', nature: '山岳、山', characteristics: '愛情・奉仕、魅力的、優しさ、権力主義、回転財、器が大きい' },
+            '己': { element: '土', yin_yang: '陰', nature: '平地、田園、畑', characteristics: '堅実、蓄積、安定、結婚運が強い、コツコツ型、庶民性' },
+            '庚': { element: '金', yin_yang: '陽', nature: '岩石、鉄鉱石、刀、剣', characteristics: '行動力、勇敢、テキパキ、爽やか、短気、飾らない' },
+            '辛': { element: '金', yin_yang: '陰', nature: '宝石、貴金属、小石、砂利', characteristics: '名誉、地位、プライド、責任感、堅い、役人' },
+            '壬': { element: '水', yin_yang: '陽', nature: '海、大湖、大河', characteristics: '知的欲求、海外、冒険、離別放浪、改良改革、体験' },
+            '癸': { element: '水', yin_yang: '陰', nature: '雨、露、霧、雲、小川', characteristics: '学問、慈愛、純粋、伝統、正統、古典的、理論家、知性' }
+        };
+
+        // 天中殺の種類
+        const TENCHUKILL_TYPES = {
+            '子丑': { name: '子丑', months: [12, 1], description: '新しいことを始める前に十分な準備期間として活用しましょう' },
+            '寅卯': { name: '寅卯', months: [2, 3], description: '春の訪れとともに、内面的な成長に集中する時期です' },
+            '辰巳': { name: '辰巳', months: [4, 5], description: 'エネルギーが高まる時期ですが、慎重な判断が必要です' },
+            '午未': { name: '午未', months: [6, 7], description: '夏の活力を抑え、冷静さを保つことが大切です' },
+            '申酉': { name: '申酉', months: [8, 9], description: '収穫の季節に向けて、現状維持に努めましょう' },
+            '戌亥': { name: '戌亥', months: [10, 11], description: '年末に向けて、来年の準備期間として捉えましょう' }
+        };
+
+        function calculateAge(birthDate) {
+            const today = new Date();
+            const birth = new Date(birthDate);
+            let age = today.getFullYear() - birth.getFullYear();
+            const monthDiff = today.getMonth() - birth.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+            
+            return age;
+        }
+
+        function getYearGanji(year) {
+            // 1924年が甲子（1番目）として計算
+            const baseYear = 1924;
+            const cycle = ((year - baseYear) % 60 + 60) % 60;
+            
+            const ganjis = [
+                '甲子', '乙丑', '丙寅', '丁卯', '戊辰', '己巳', '庚午', '辛未', '壬申', '癸酉',
+                '甲戌', '乙亥', '丙子', '丁丑', '戊寅', '己卯', '庚辰', '辛巳', '壬午', '癸未',
+                '甲申', '乙酉', '丙戌', '丁亥', '戊子', '己丑', '庚寅', '辛卯', '壬辰', '癸巳',
+                '甲午', '乙未', '丙申', '丁酉', '戊戌', '己亥', '庚子', '辛丑', '壬寅', '癸卯',
+                '甲辰', '乙巳', '丙午', '丁未', '戊申', '己酉', '庚戌', '辛亥', '壬子', '癸丑',
+                '甲寅', '乙卯', '丙辰', '丁巳', '戊午', '己未', '庚申', '辛酉', '壬戌', '癸亥'
+            ];
+            
+            return ganjis[cycle];
+        }
+
+        function getTenchukillType(yearGanji) {
+            const yearGan = yearGanji[0];
+            const ganToTenchukill = {
+                '甲': '戌亥', '乙': '戌亥',
+                '丙': '申酉', '丁': '申酉',
+                '戊': '午未', '己': '午未',
+                '庚': '辰巳', '辛': '辰巳',
+                '壬': '寅卯', '癸': '寅卯'
+            };
+            return ganToTenchukill[yearGan] || '子丑';
+        }
+
+        function validateInput() {
+            const name = document.getElementById('name').value.trim();
+            const birthdate = document.getElementById('birthdate').value;
+            const gender = document.getElementById('gender').value;
+
+            if (!name) return '名前を入力してください。';
+            if (name.length > 50) return '名前は50文字以内で入力してください。';
+            if (!birthdate) return '生年月日を選択してください。';
+            if (!gender) return '性別を選択してください。';
+
+            const birthYear = new Date(birthdate).getFullYear();
+            if (birthYear < 1900 || birthYear > new Date().getFullYear()) {
+                return '正しい生年月日を入力してください。';
+            }
+
+            return null;
+        }
+
+        async function calculateFortune() {
+            const errorDiv = document.getElementById('error');
+            const loadingDiv = document.getElementById('loading');
+            const calculateBtn = document.querySelector('.calculate-btn');
+
+            // バリデーション
+            const validationError = validateInput();
+            if (validationError) {
+                errorDiv.textContent = validationError;
+                return;
+            }
+
+            errorDiv.textContent = '';
+            
+            // ローディング開始
+            loadingDiv.style.display = 'block';
+            calculateBtn.disabled = true;
+            calculateBtn.textContent = '計算中...';
+
+            try {
+                // 少し待機してローディング感を演出
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                const name = document.getElementById('name').value.trim();
+                const birthdate = document.getElementById('birthdate').value;
+                const gender = document.getElementById('gender').value;
+
+                const birthYear = new Date(birthdate).getFullYear();
+                const age = calculateAge(birthdate);
+                const yearGanji = getYearGanji(birthYear);
+                const dayGan = yearGanji[0]; // 簡略化: 実際は複雑な計算が必要
+                const tenchukillType = getTenchukillType(yearGanji);
+
+                // 基本情報の表示
+                document.getElementById('basic-info').innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <p><strong>👤 お名前:</strong> ${name}</p>
+                        <p><strong>📅 生年月日:</strong> ${new Date(birthdate).toLocaleDateString('ja-JP')}</p>
+                        <p><strong>🎂 年齢:</strong> ${age}歳</p>
+                        <p><strong>🐲 年干支:</strong> ${yearGanji}</p>
+                        <p><strong>☯️ 日干:</strong> ${dayGan}</p>
+                        <p><strong>⚥ 性別:</strong> ${gender === 'male' ? '男性' : '女性'}</p>
+                    </div>
+                `;
+
+                // 人体図の表示（簡略化）
+                const ganData = GANJIS[dayGan];
+                document.getElementById('center').innerHTML = `
+                    <div class="star-name">${dayGan}</div>
+                    <div class="star-type">${ganData.element}性 ${ganData.yin_yang}</div>
+                `;
+
+                // 他の位置も更新
+                document.getElementById('north').innerHTML += `<div style="font-size: 10px; margin-top: 5px;">思考・直感</div>`;
+                document.getElementById('south').innerHTML += `<div style="font-size: 10px; margin-top: 5px;">社会での顔</div>`;
+                document.getElementById('east').innerHTML += `<div style="font-size: 10px; margin-top: 5px;">行動パターン</div>`;
+                document.getElementById('west').innerHTML += `<div style="font-size: 10px; margin-top: 5px;">家族関係</div>`;
+
+                // 性格・特徴の表示
+                document.getElementById('characteristics').innerHTML = `
+                    <p><strong>🌳 自然界での象徴:</strong> ${ganData.nature}</p>
+                    <p><strong>✨ 主な特徴:</strong> ${ganData.characteristics}</p>
+                    <p><strong>🔥 五元素:</strong> ${ganData.element}性（${ganData.yin_yang}）</p>
+                    <p><strong>💭 基本性格:</strong> ${getPersonalityDescription(dayGan, gender)}</p>
+                `;
+
+                // 天中殺の表示
+                const tenchukill = TENCHUKILL_TYPES[tenchukillType];
+                document.getElementById('tenchukill').innerHTML = `
+                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 15px;">
+                        <p><strong>🔮 天中殺の種類:</strong> ${tenchukill.name}天中殺</p>
+                        <p><strong>📅 天中殺月:</strong> ${tenchukill.months.join('、')}月</p>
+                        <p><strong>📋 アドバイス:</strong> ${tenchukill.description}</p>
+                        <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">
+                            ※天中殺期間中は新しい挑戦よりも現状の充実に集中することをお勧めします。
+                        </p>
+                    </div>
+                `;
+
+                // 結果を表示
+                document.getElementById('results').style.display = 'block';
+                document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+
+            } catch (error) {
+                errorDiv.textContent = '計算中にエラーが発生しました。もう一度お試しください。';
+            } finally {
+                // ローディング終了
+                loadingDiv.style.display = 'none';
+                calculateBtn.disabled = false;
+                calculateBtn.textContent = '🔮 占う';
+            }
+        }
+
+        function getPersonalityDescription(dayGan, gender) {
+            const descriptions = {
+                '甲': gender === 'male' ? 
+                    '大きな目標に向かってコツコツと努力を重ねるタイプです。リーダーシップがあり、周囲からの信頼も厚い方でしょう。' :
+                    '芯の強さを持ちながらも、優しさと包容力を兼ね備えた女性です。家庭と仕事の両立も上手にこなします。',
+                '乙': gender === 'male' ? 
+                    '協調性に優れ、チームをまとめる能力に長けています。政治力もあり、人との関係構築が得意です。' :
+                    '社交的で人当たりが良く、多くの人から愛される魅力的な女性です。コミュニケーション能力に優れています。',
+                '丙': gender === 'male' ? 
+                    '明るく開放的で、情報伝達能力に優れています。自然体でありながら、正確性も重視する方です。' :
+                    'おおらかで温かい人柄の女性です。周囲を明るくする太陽のような存在として慕われるでしょう。',
+                '丁': gender === 'male' ? 
+                    '繊細で向上心が強く、自分の世界を大切にします。専門性を活かした分野で力を発揮するでしょう。' :
+                    'デリケートで心優しい女性です。芸術的センスがあり、美しいものへの感受性が豊かです。',
+                '戊': gender === 'male' ? 
+                    '愛情深く奉仕精神に富んでいます。人・物・お金を循環させる能力があり、リーダーとして活躍します。' :
+                    '母性愛に溢れ、周囲の人を大切にする優しい女性です。家庭運に恵まれ、安定した生活を築きます。',
+                '己': gender === 'male' ? 
+                    '堅実で安定を重視し、コツコツと努力を積み重ねるタイプです。結婚運も良く、家庭を大切にします。' :
+                    '堅実で家庭的な女性です。蓄積型の運勢を持ち、着実に幸せを築いていくでしょう。',
+                '庚': gender === 'male' ? 
+                    '行動力があり勇敢で、テキパキと物事を処理します。爽やかな印象を与える頼りがいのある男性です。' :
+                    '行動力があり、飾らない性格の女性です。短気な面もありますが、率直で信頼できる人柄です。',
+                '辛': gender === 'male' ? 
+                    'プライドが高く責任感が強い、役人タイプの男性です。名誉と地位を重視し、堅実に歩んでいきます。' :
+                    '上品で責任感の強い女性です。プライドを持って生きており、周囲からも一目置かれる存在です。',
+                '壬': gender === 'male' ? 
+                    '知的好奇心が旺盛で、改良改革を好みます。海外との縁もあり、冒険心に富んだ方です。' :
+                    '知的で好奇心旺盛な女性です。新しいことへの探究心があり、変化を恐れない進歩的な人です。',
+                '癸': gender === 'male' ? 
+                    '学問を愛し、純粋で伝統を重んじます。知性的で理論家タイプの落ち着いた男性です。' :
+                    '慈愛に満ち、純粋で上品な女性です。古典的な美しさを持ち、知性と品格を兼ね備えています。'
+            };
+            return descriptions[dayGan] || '個性豊かな性格をお持ちの方です。';
+        }
+
+        // ページ読み込み時に今日の日付を設定
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const maxDate = today.toISOString().split('T')[0];
+            document.getElementById('birthdate').max = maxDate;
+        });
+
+        // エンターキーで占い実行
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && !document.querySelector('.calculate-btn').disabled) {
+                calculateFortune();
+            }
+        });
+    </script>
+</body>
+</html>
